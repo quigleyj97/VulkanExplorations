@@ -29,7 +29,11 @@ file(GLOB SHADERS shaders/*.spv)
 file(GLOB SHADERSRC shaders/*.frag shaders/*.vert)
 source_group("Shaders" FILES ${SHADERSRC})
 
+file(GLOB RESOURCES res/*)
+source_group("Resources" FILES ${RESOURCES})
+
 file(COPY ${SHADERS} DESTINATION "${CMAKE_BINARY_DIR}/bin/shaders")
+file(COPY ${RESOURCES} DESTINATION "${CMAKE_BINARY_DIR}/bin/res")
 
 add_executable(VulkanExplorations HelloVulkan.cpp ${outres})
 target_link_libraries(VulkanExplorations ${Vulkan_LIBRARIES} glfw ${WINLIBS})
