@@ -93,7 +93,7 @@ struct SwapChainSupportDetails {
 };
 
 struct Vertex {
-	glm::vec2 pos;
+	glm::vec3 pos;
 	glm::vec3 color;
 	glm::vec2 texCoord;
 
@@ -109,7 +109,7 @@ struct Vertex {
 			vk::VertexInputAttributeDescription()
 				.setBinding(0)
 				.setLocation(0)
-				.setFormat(vk::Format::eR32G32Sfloat)
+				.setFormat(vk::Format::eR32G32B32Sfloat)
 				.setOffset(offsetof(Vertex, pos)),
 			vk::VertexInputAttributeDescription()
 				.setBinding(0)
@@ -131,16 +131,22 @@ struct UniformBufferObject {
 	glm::mat4 proj;
 };
 
-const std::array<Vertex, 4> vertices {
-	Vertex {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-	Vertex {{ 0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-	Vertex {{ 0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-	Vertex {{-0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
+const std::array<Vertex, 8> vertices {
+	Vertex {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+	Vertex {{ 0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+	Vertex {{ 0.5f,  0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+	Vertex {{-0.5f,  0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
+
+	Vertex {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+	Vertex {{ 0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+	Vertex {{ 0.5f,  0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+	Vertex {{-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
 };
 
 
-const std::array<uint16_t, 6> indices = {
-	0, 1, 2, 2, 3, 0
+const std::array<uint16_t, 12> indices = {
+	0, 1, 2, 2, 3, 0,
+	4, 5, 6, 6, 7, 4
 };
 
 class ApplicationModule {
@@ -1580,8 +1586,10 @@ int main() {
 		return EXIT_FAILURE;
 	}
 
+#ifdef MSVC
 	std::cout << "Press enter to quit...";
 	std::cin.get();
+#endif
 
 	return EXIT_SUCCESS;
 }
