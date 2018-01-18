@@ -35,5 +35,9 @@ source_group("Resources" FILES ${RESOURCES})
 file(COPY ${SHADERS} DESTINATION "${CMAKE_BINARY_DIR}/bin/shaders")
 file(COPY ${RESOURCES} DESTINATION "${CMAKE_BINARY_DIR}/bin/res")
 
+if(NOT MSVC)
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
+endif()
+
 add_executable(VulkanExplorations HelloVulkan.cpp ${outres})
 target_link_libraries(VulkanExplorations ${Vulkan_LIBRARIES} glfw ${WINLIBS})
