@@ -23,6 +23,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <gli/gli.hpp>
 #include <gli/texture.hpp>
+#include <tiny_obj_loader.h>
 
 const std::array<std::string, 1> validationLayers = {
 	"VK_LAYER_LUNARG_standard_validation"
@@ -131,7 +132,7 @@ struct UniformBufferObject {
 	glm::mat4 proj;
 };
 
-const std::array<Vertex, 8> vertices {
+/*const std::array<Vertex, 8> vertices {
 	Vertex {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
 	Vertex {{ 0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
 	Vertex {{ 0.5f,  0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
@@ -147,7 +148,7 @@ const std::array<Vertex, 8> vertices {
 const std::array<uint16_t, 12> indices = {
 	0, 1, 2, 2, 3, 0,
 	4, 5, 6, 6, 7, 4
-};
+};*/
 
 class ApplicationModule {
 public:
@@ -162,6 +163,8 @@ public:
 	}
 	const int WindowWidth = 800;
 	const int WindowHeight = 600;
+    const std::string ModelPath = "res/chalet.obj";
+    const std::string TexturePath = "res/chalet.dds";
 private:
 	GLFWwindow * window = nullptr;
 	vk::Instance instance;
@@ -185,6 +188,8 @@ private:
 	std::vector<vk::CommandBuffer> commandBuffers;
 	vk::Semaphore imageAvailableSemaphore;
 	vk::Semaphore renderFinishedSemaphore;
+    std::vector<Vertex> vertices;
+    std::vector<uint32_t> indices;
 	vk::Buffer vertexBuffer;
 	vk::DeviceMemory vertexBufferMemory;
 	vk::Buffer indexBuffer;
@@ -236,6 +241,7 @@ private:
 		createTextureImage();
 		createTextureImageView();
 		createTextureSampler();
+		loadModel();
 		createVertexBuffer();
 		createIndexBuffer();
 		createUniformBuffer();
@@ -965,7 +971,7 @@ private:
 				std::array<vk::Buffer, 1> buffers = { vertexBuffer };
 				std::array<vk::DeviceSize, 1> offsets = { 0 };
 				buffer.bindVertexBuffers(0, static_cast<uint32_t>(buffers.size()), buffers.data(), offsets.data());
-				buffer.bindIndexBuffer(indexBuffer, 0, vk::IndexType::eUint16);
+				buffer.bindIndexBuffer(indexBuffer, 0, vk::IndexType::eUint32);
 				buffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipelineLayout, 0, { descriptorSet }, {});
 
 				buffer.drawIndexed(static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
@@ -1226,7 +1232,7 @@ private:
 
 	// todo: generic-ize this function, make it not throw
 	void createTextureImage() {
-		auto texture = gli::load("./res/breadtangle.dds");
+		auto texture = gli::load(TexturePath);
 		if (texture.empty()) {
 			throw std::runtime_error("Texture not found");
 		}
@@ -1482,6 +1488,43 @@ private:
 		return format == vk::Format::eD32SfloatS8Uint || format == vk::Format::eD24UnormS8Uint;
 	}
 
+	void loadModel() {
+		tinyobj::attrib_t attrib;
+		std::vector<tinyobj::shape_t> shapes;
+		std::vector<tinyobj::material_t> materials;
+		std::string err;
+
+		if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &err, ModelPath.c_str())) {
+			throw std::runtime_error(err);
+		}
+
+		if (!err.empty()) {
+			std::cerr << "warning when loading file: " << err << std::endl;
+		}
+
+		for (const auto& shape: shapes) {
+			for (const auto& index: shape.mesh.indices) {
+				Vertex vertex = {};
+
+				vertex.pos = {
+					attrib.vertices[3 * index.vertex_index + 0],
+					attrib.vertices[3 * index.vertex_index + 1],
+					attrib.vertices[3 * index.vertex_index + 2],
+				};
+
+				vertex.texCoord = {
+					attrib.texcoords[2 * index.texcoord_index + 0],
+					1.0f - attrib.texcoords[2 * index.texcoord_index + 1],
+				};
+
+				vertex.color = {1.0f, 1.0f, 1.0f};
+
+				vertices.push_back(vertex);
+				indices.push_back(static_cast<unsigned int>(indices.size()));
+			}
+		}
+	}
+
 	#pragma endregion Vulkan utility functions
 
 	#pragma region
@@ -1685,8 +1728,10 @@ int main() {
 		app.run();
 	} catch (const std::runtime_error& e) {
 		std::cerr << e.what() << std::endl;
+#ifdef MSVC
 		std::cout << "Press enter to acknowledge and quit...";
 		std::cin.get();
+#endif
 		return EXIT_FAILURE;
 	}
 

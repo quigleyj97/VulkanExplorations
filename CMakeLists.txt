@@ -19,9 +19,12 @@ set(GLFW_BUILD_EXAMPLES OFF)
 set(GLFW_BUILD_DOCS OFF)
 add_subdirectory(external/glfw)
 
+add_definitions(-DTINYOBJLOADER_IMPLEMENTATION)
+add_subdirectory(external/tinyobjloader)
+
 add_definitions(-DGLM_FORCE_RADIANS)
 add_definitions(-DGLM_FORCE_DEPTH_ZERO_TO_ONE)
-include_directories(external/gli external/glm external/glfw/include ${Vulkan_INCLUDE_DIRS})
+include_directories(external/gli external/glm external/glfw/include external/tinyobjloader/ ${Vulkan_INCLUDE_DIRS})
 
 set(BUILD_SHARED_LIBS OFF)
 
