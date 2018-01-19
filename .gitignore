@@ -260,3 +260,7 @@ paket-files/
 __pycache__/
 *.pyc
 *.spv
+
+# Unignore everything under /res
+
+!/res/*

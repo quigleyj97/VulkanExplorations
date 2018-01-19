@@ -7,3 +7,6 @@
 [submodule "external/gli"]
 	path = external/gli
 	url = https://github.com/g-truc/gli.git
+[submodule "external/tinyobjloader"]
+	path = external/tinyobjloader
+	url = https://github.com/syoyo/tinyobjloader.git
