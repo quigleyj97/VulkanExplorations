@@ -213,7 +213,7 @@ private:
 	vk::DeviceMemory indexBufferMemory;
 	vk::Buffer uniformBuffer;
 	vk::DeviceMemory uniformBufferMemory;
-	std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::high_resolution_clock::now();
+	std::chrono::time_point<std::chrono::high_resolution_clock> startTime = std::chrono::high_resolution_clock::now();
 	vk::DescriptorPool descriptorPool;
 	vk::DescriptorSet descriptorSet;
 	vk::Image textureImage;
