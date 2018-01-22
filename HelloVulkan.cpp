@@ -739,8 +739,8 @@ private:
 	}
 
 	void createGraphicsPipeline() {
-		const auto vertShaderSrc = readFile("shaders/vert.spv");
-		const auto fragShaderSrc = readFile("shaders/frag.spv");
+		const auto vertShaderSrc = readFile("shaders/shader.vert.spv");
+		const auto fragShaderSrc = readFile("shaders/shader.frag.spv");
 
 		vk::ShaderModule vertShaderModule = createShaderModule(vertShaderSrc);
 		vk::ShaderModule fragShaderModule = createShaderModule(fragShaderSrc);
@@ -1751,14 +1751,14 @@ int main() {
 		app.run();
 	} catch (const std::runtime_error& e) {
 		std::cerr << e.what() << std::endl;
-#ifdef MSVC
+#ifdef _MSC_VER
 		std::cout << "Press enter to acknowledge and quit...";
 		std::cin.get();
 #endif
 		return EXIT_FAILURE;
 	}
 
-#ifdef MSVC
+#ifdef _MSC_VER
 	std::cout << "Press enter to quit...";
 	std::cin.get();
 #endif
